@@ -9,6 +9,7 @@ var color = Color(1.0, 1.0, 1.0)
 var font = null
 var label_count = 0
 var label_step_rad = 0.0
+var label_placeholder = "Spin again"
 
 func _ready():
 	font = DynamicFont.new()
@@ -20,31 +21,21 @@ func _draw():
 	if (labels.size() == 0):
 		return
 
+	# enforce even number of labels
 	if (labels.size() % 2):
-		labels.append("Spin again")
+		labels.append(label_placeholder)
 	
 	label_count = labels.size()
 	label_step_rad = 2 * PI/label_count
 	var current_rotation_rad = 0.0
 
 	var counter = 0
-
-	# prepare background
-	var last_boundary_rad = PI - 2 * label_step_rad
-	var first_boundary_rad = 2 * label_step_rad
-	
-	var a = Vector2(0, 0)
-	var b = Vector2(radius * sin(last_boundary_rad), radius * cos(last_boundary_rad))
-	var c = Vector2(b.x, -b.y)
-	
-	var points = [ a, b, c ]
-	
+		
 	for label in labels:
 		# draw background
 		counter += 1
 		var color = Color(255, 0, 0) if (counter % 2) else Color(0, 0, 0)		
-		var colors = [ color, color, color ]
-		draw_polygon(points, colors)
+		draw_circle_arc_poly(Vector2(0, 0), radius, rad2deg(PI/2 - label_step_rad/2), rad2deg(PI/2 + label_step_rad/2), color)
 
 		# draw label
 		var font_size = font.get_string_size(label)
@@ -57,6 +48,18 @@ func _draw():
 		draw_set_transform(Vector2(0, 0), current_rotation_rad, Vector2(1, 1))
 	pass
 
+# https://docs.godotengine.org/en/stable/tutorials/2d/custom_drawing_in_2d.html
+func draw_circle_arc_poly(center, radius, angle_from, angle_to, color):
+	var nb_points = 32
+	var points_arc = PoolVector2Array()
+	points_arc.push_back(center)
+	var colors = PoolColorArray([color])
+
+	for i in range(nb_points + 1):
+		var angle_point = deg2rad(angle_from + i * (angle_to - angle_from) / nb_points - 90)
+		points_arc.push_back(center + Vector2(cos(angle_point), sin(angle_point)) * radius)
+	draw_polygon(points_arc, colors)
+
 func normalize_rad(rad):
 	if (rad < 0 && rad > -2 * PI):
 		rad = rad + 2 * PI
@@ -67,20 +70,30 @@ func get_top_label(rotation_rad):
 	var labels_inverted = global.labels.duplicate()
 	labels_inverted.invert()
 	
-	print(labels_inverted)
+	# flip negative values
+	if (rotation_rad < 0.0):
+		rotation_rad = fmod(rotation_rad, 2 * PI) + 2 * PI
+	
+	# >= 0 does not match initial 0, so adjust here
+	if (rotation_rad == 0.0):
+		rotation_rad = 0.000001
 	
 	var index = 0
-	var adjust = 4.712389
+	var adjust = 4.712389 # pick top label
 	var selection = ""
+	var lower = 0.0
+	var upper = 0.0
 	for label in labels_inverted:
-		var lower = normalize_rad(index * label_step_rad + 0.5 * label_step_rad + adjust)
-		var upper = normalize_rad((index + 1) * label_step_rad + 0.5 * label_step_rad + adjust)
+		lower = normalize_rad(index * label_step_rad + 0.5 * label_step_rad + adjust)
+		upper = normalize_rad((index + 1) * label_step_rad + 0.5 * label_step_rad + adjust)
 		
 		if (rotation_rad >= lower && rotation_rad < upper):
 			return label
-		elif (lower > upper && rotation_rad > upper && rotation_rad > lower):
-			return label
+		elif (lower > upper):
+			if (rotation_rad >= upper && rotation_rad >= lower):
+				return label
+			elif (rotation_rad < upper && rotation_rad < lower):
+				return label
 
 		index = index + 1
-
-	return "not found"
+	return "not found" 
