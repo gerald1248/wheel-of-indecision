@@ -41,7 +41,8 @@ func _draw():
 		var font_size = font.get_string_size(label)
 		if font_size.x > label_box_width:
 			font_size.x = label_box_width
-		draw_string(font, Vector2(radius_border + label_box_width - font_size.x, font_size.y/2),label, Color(255, 255, 255), label_box_width)
+		# allow 1.5 times padding at center
+		draw_string(font, Vector2(radius_border * 1.5 + label_box_width - font_size.x, font_size.y/2),label, Color(255, 255, 255), label_box_width)
 
 		# rotate
 		current_rotation_rad += label_step_rad

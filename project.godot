@@ -35,6 +35,10 @@ settings/fps/force_fps=60
 
 window/dpi/allow_hidpi=true
 
+[gui]
+
+theme/use_hidpi=true
+
 [rendering]
 
 environment/default_clear_color=Color( 0.141176, 0.141176, 0.141176, 1 )

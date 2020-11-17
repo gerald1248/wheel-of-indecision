@@ -1,8 +1,10 @@
 extends Node2D
 
 const CANVAS = preload("res://canvas.tscn")
+const HUD = preload("res://hud.tscn")
 var rotation_per_second_rad = 0.0
 var canvas = null
+var hud = null
 var timer = null
 var rng = null
 var viewport_size = Vector2(0, 0)
@@ -21,6 +23,11 @@ func _ready():
 	canvas = CANVAS.instance()
 	canvas.z_index = -1
 	add_child(canvas)
+
+	hud = HUD.instance()
+	hud.z_index = 100
+	add_child(hud)
+	
 	update_size()
 	
 	font = DynamicFont.new()
@@ -67,6 +74,8 @@ func update_size():
 	# center on viewport
 	viewport_size = get_viewport().get_visible_rect().size
 	viewport_center = Vector2(viewport_size.x/2, viewport_size.y/2)
+	
+	var selection = hud.update_size(viewport_size, viewport_center)
 	
 	# scale to smaller dimension
 	var min_length = min(viewport_size.x, viewport_size.y)
