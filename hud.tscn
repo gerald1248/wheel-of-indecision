@@ -1,15 +1,15 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://hud.gd" type="Script" id=1]
-[ext_resource path="res://fonts/Roboto-Thin.ttf" type="DynamicFontData" id=2]
-
-[sub_resource type="DynamicFont" id=1]
-size = 60
-font_data = ExtResource( 2 )
-
-[sub_resource type="DynamicFont" id=2]
-size = 60
-font_data = ExtResource( 2 )
+[ext_resource path="res://sprites/rotate_right-888-128x128.png" type="Texture" id=2]
+[ext_resource path="res://sprites/edit-inv-96x96.png" type="Texture" id=3]
+[ext_resource path="res://sprites/rotate_right-aaa-128x128.png" type="Texture" id=4]
+[ext_resource path="res://sprites/rotate_right-ccc-128x128.png" type="Texture" id=5]
+[ext_resource path="res://sprites/edit-ccc-96x96.png" type="Texture" id=6]
+[ext_resource path="res://sprites/edit-aaa-96x96.png" type="Texture" id=7]
+[ext_resource path="res://sprites/edit-888-96x96.png" type="Texture" id=8]
+[ext_resource path="res://sprites/rotate_right-inv-128x128.png" type="Texture" id=9]
+[ext_resource path="res://sprites/rotate_right-ccc-96x96.png" type="Texture" id=10]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
@@ -19,20 +19,36 @@ color = Color( 0.141176, 0.141176, 0.141176, 1 )
 antialiased = true
 polygon = PoolVector2Array( -50, -25, 50, -25, 0, 25 )
 
-[node name="Spin" type="Button" parent="."]
+[node name="Spin" type="TextureButton" parent="."]
 margin_right = 12.0
 margin_bottom = 20.0
-custom_fonts/font = SubResource( 1 )
-text = "Spin"
+hint_tooltip = "Spin the wheel"
+focus_next = NodePath("../Settings")
+focus_previous = NodePath("../Settings")
+action_mode = 0
+texture_normal = ExtResource( 4 )
+texture_pressed = ExtResource( 9 )
+texture_hover = ExtResource( 5 )
+texture_disabled = ExtResource( 2 )
+texture_focused = ExtResource( 10 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Settings" type="Button" parent="."]
-margin_right = 12.0
-margin_bottom = 20.0
-custom_fonts/font = SubResource( 2 )
-text = "Settings"
+[node name="Settings" type="TextureButton" parent="."]
+margin_right = 96.0
+margin_bottom = 96.0
+rect_scale = Vector2( 0.75, 0.75 )
+hint_tooltip = "Settings"
+focus_next = NodePath("../Spin")
+focus_previous = NodePath("../Spin")
+texture_normal = ExtResource( 7 )
+texture_pressed = ExtResource( 3 )
+texture_hover = ExtResource( 6 )
+texture_disabled = ExtResource( 8 )
+texture_focused = ExtResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+[connection signal="pressed" from="Spin" to="." method="_on_Spin_pressed"]
+[connection signal="pressed" from="Settings" to="." method="_on_Settings_pressed"]

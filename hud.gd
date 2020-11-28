@@ -1,6 +1,6 @@
 extends Node2D
 
-var padding = 30
+var padding = global.gui_padding
 
 func _ready():
 	pass
@@ -13,3 +13,10 @@ func update_size(viewport_size, viewport_center):
 	
 	$Settings.rect_position = Vector2(viewport_size.x - $Settings.rect_size.x - padding, padding)
 	$Spin.rect_position = Vector2(viewport_size.x - $Spin.rect_size.x - padding, viewport_size.y - $Spin.rect_size.y - padding)
+
+func _on_Settings_pressed():
+	get_tree().change_scene("res://settings.tscn")
+
+func _on_Spin_pressed():
+	get_tree().get_root().get_node("Node2D").spin()
+

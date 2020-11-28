@@ -1,0 +1,76 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://settings.gd" type="Script" id=1]
+[ext_resource path="res://sprites/close-aaa-96x96.png" type="Texture" id=2]
+[ext_resource path="res://sprites/close-888-96x96.png" type="Texture" id=3]
+[ext_resource path="res://sprites/close-inv-96x96.png" type="Texture" id=4]
+[ext_resource path="res://sprites/close-ccc-96x96.png" type="Texture" id=5]
+[ext_resource path="res://sprites/check-ccc-96x96.png" type="Texture" id=6]
+[ext_resource path="res://sprites/check-888-96x96.png" type="Texture" id=7]
+[ext_resource path="res://sprites/check-inv-96x96.png" type="Texture" id=8]
+[ext_resource path="res://sprites/check-aaa-96x96.png" type="Texture" id=9]
+[ext_resource path="res://fonts/Roboto-Thin.ttf" type="DynamicFontData" id=10]
+[ext_resource path="res://fonts/Roboto-Bold.ttf" type="DynamicFontData" id=11]
+
+[sub_resource type="DynamicFont" id=1]
+size = 40
+font_data = ExtResource( 11 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 40
+font_data = ExtResource( 10 )
+
+[sub_resource type="Theme" id=2]
+default_font = SubResource( 4 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 40
+font_data = ExtResource( 10 )
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_right = 40.0
+margin_bottom = 48.0
+custom_fonts/font = SubResource( 1 )
+custom_colors/font_color = Color( 0.666667, 0.666667, 0.666667, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Tree" type="Tree" parent="."]
+margin_right = 40.0
+margin_bottom = 1.0
+theme = SubResource( 2 )
+custom_fonts/font = SubResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CancelButton" type="TextureButton" parent="."]
+margin_right = 54.0
+margin_bottom = 20.0
+rect_scale = Vector2( 0.75, 0.75 )
+texture_normal = ExtResource( 2 )
+texture_pressed = ExtResource( 4 )
+texture_hover = ExtResource( 5 )
+texture_disabled = ExtResource( 3 )
+
+[node name="OkButton" type="TextureButton" parent="."]
+margin_right = 31.0
+margin_bottom = 20.0
+rect_scale = Vector2( 0.75, 0.75 )
+texture_normal = ExtResource( 9 )
+texture_pressed = ExtResource( 8 )
+texture_hover = ExtResource( 6 )
+texture_disabled = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="button_pressed" from="Tree" to="." method="_on_Tree_button_pressed"]
+[connection signal="cell_selected" from="Tree" to="." method="_on_Tree_cell_selected"]
+[connection signal="item_edited" from="Tree" to="." method="_on_Tree_item_edited"]
+[connection signal="item_selected" from="Tree" to="." method="_on_Tree_item_selected"]
+[connection signal="pressed" from="CancelButton" to="." method="_on_CancelButton_pressed"]
+[connection signal="pressed" from="OkButton" to="." method="_on_OkButton_pressed"]
