@@ -18,6 +18,22 @@ var desired_transform = Transform2D()
 var countdown = 0
 var font = null
 
+# manage touch control state
+var previous_rotation_rad = 0.0
+var previous_speed = Vector2(0.0, 0.0)
+var previous_drag_time_msec = 0
+var delta_rad = 0.0
+var delta_msec = 0
+var drag_time_threshold = 1 #2 #5
+var delta_rad_threshold = 0.005
+
+enum TOUCH_STATE {
+	Idle,
+	Down
+}
+
+var touch_state = TOUCH_STATE.Idle
+
 func _ready():
 	rng = RandomNumberGenerator.new()	
 
@@ -98,7 +114,7 @@ func spin():
 	$Label.hide()
 
 	rng.randomize()
-	start_angle = canvas.rotation + 4 * PI + rng.randf() * PI * 2
+	start_angle = canvas.rotation + 2 * PI + rng.randf() * PI * 2.0
 	rotation_per_second_rad = global.base_top_speed
 
 func reveal():
@@ -115,3 +131,57 @@ func reveal():
 	$Label.rect_scale = Vector2(0.25, 0.25)
 	$Label.show_on_top = true
 	$Label.show()
+
+func _unhandled_input(event):
+	# exit condition: no touch press
+	match event.get_class():
+		"InputEventScreenTouch":
+			var position = event.position
+			var rotation_rad = get_rotation_at(position)
+			# touch press
+			if event.pressed:
+				$Label.hide()
+				touch_state = TOUCH_STATE.Down
+				previous_rotation_rad = rotation_rad
+				var time_msec = OS.get_ticks_msec()
+				
+				previous_drag_time_msec = time_msec if time_msec != previous_drag_time_msec else previous_drag_time_msec
+			# touch release
+			else:
+				# spin if previous recorded angle not same
+				touch_state = TOUCH_STATE.Idle
+				var elapsed_time = OS.get_ticks_msec() - previous_drag_time_msec
+
+				# if no recent rotation change, stop movement
+				if (elapsed_time > drag_time_threshold || delta_rad < delta_rad_threshold):
+					print("movement stopped")
+					return
+				else:
+					# use delta_* values
+					print("keep spinning")
+					delta_msec = 1 if delta_msec < 1 else delta_msec
+					rotation_per_second_rad = (delta_rad/delta_msec) * 1000
+					#rotation_per_second_rad = (1000 * delta_rad)/elapsed_time
+		"InputEventScreenDrag":
+			var position = event.position
+			var rotation_rad = get_rotation_at(position)
+			
+			var my_delta = rotation_rad - previous_rotation_rad
+			canvas.rotate(my_delta)
+
+			# now update delta_rad, but only if meaningful
+			var now = OS.get_ticks_msec()
+			if abs(my_delta) > delta_rad_threshold:
+				delta_rad = my_delta
+				delta_msec = now - previous_drag_time_msec
+				previous_drag_time_msec = now
+
+			# now update state
+			previous_rotation_rad = rotation_rad
+			previous_drag_time_msec = OS.get_ticks_msec()
+			
+		_:
+			pass
+
+func get_rotation_at(my_position):
+	return atan2(my_position.y - viewport_center.y, my_position.x - viewport_center.x)

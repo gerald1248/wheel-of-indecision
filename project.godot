@@ -45,6 +45,10 @@ window/dpi/allow_hidpi=true
 
 theme/use_hidpi=true
 
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
 [rendering]
 
 environment/default_clear_color=Color( 0.141176, 0.141176, 0.141176, 1 )
