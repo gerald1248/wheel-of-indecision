@@ -9,6 +9,7 @@ var font = null
 var label_count = 0
 var label_step_rad = 0.0
 var label_placeholder = "Spin again"
+var vertical_adjust = 20.0
 var colors = {
 	"red": Color("#ff4136"),
 	"orange": Color("#ff851B"),
@@ -17,22 +18,22 @@ var colors = {
 	"green": Color("#2ecc40"),
 	"olive": Color("#3d9970"),
 	"teal": Color("#39cccc"),
+	"aqua": Color("#7fdbff"),
 	"blue": Color("#0074d9"),
 	"navy": Color("#001f3f"),
-	"aqua": Color("#7fdbff"),
 	"purple": Color("#b10dc9"),
 	"fuchsia": Color("#f012be"),
 	"maroon": Color("#85144b"),
 	"black": Color("#111111")
 }
 
-var colors_2 = [ colors.navy, colors.black ]#[ colors.red, colors.blue ]
+var colors_2 = [ colors.red, colors.blue ]
 var colors_4 = [ colors.red, colors.yellow, colors.green, colors.blue ]
 var colors_6 = [ colors.red, colors.orange, colors.yellow, colors.green, colors.teal, colors.blue ]
 var colors_8 = [ colors.red, colors.orange, colors.yellow, colors.lime, colors.green, colors.olive, colors.blue, colors.fuchsia ]
-var colors_10 = [ colors.red, colors.orange, colors.yellow, colors.lime, colors.green, colors.olive, colors.blue, colors.aqua, colors.purple, colors.maroon ]
+var colors_10 = [ colors.red, colors.orange, colors.yellow, colors.lime, colors.green, colors.olive, colors.teal, colors.blue, colors.purple, colors.maroon ]
+var colors_12 = [ colors.red, colors.orange, colors.yellow, colors.lime, colors.green, colors.olive, colors.teal, colors.aqua, colors.blue, colors.purple, colors.fuchsia, colors.maroon ]
 var colors_alternating = colors_2.duplicate()
-
 
 func _ready():
 	font = DynamicFont.new()
@@ -61,6 +62,8 @@ func _draw():
 			my_colors = colors_8
 		10:
 			my_colors = colors_10
+		12:
+			my_colors = colors_12
 		_:
 			my_colors = colors_alternating
 
@@ -81,9 +84,9 @@ func _draw():
 		if font_size.x > label_box_width:
 			font_size.x = label_box_width
 		# color threshold for black/white text is 110
-		var color_threshold = 110
+		#var color_threshold = 110
 		var label_color = get_font_color(color)
-		draw_string(font, Vector2(radius_border * 1.5 + label_box_width - font_size.x, font_size.y/2),label, label_color, label_box_width)
+		draw_string(font, Vector2(radius_border * 1.5 + label_box_width - font_size.x, font_size.y/2-vertical_adjust),label, label_color, label_box_width)
 
 		# rotate
 		current_rotation_rad += label_step_rad
@@ -156,4 +159,4 @@ func get_top_label(rotation_rad):
 				return label
 
 		index = index + 1
-	return "not found" 
+	return "redacted"

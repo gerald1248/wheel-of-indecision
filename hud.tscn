@@ -1,13 +1,12 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://hud.gd" type="Script" id=1]
 [ext_resource path="res://sprites/rotate_right-888-128x128.png" type="Texture" id=2]
-[ext_resource path="res://sprites/edit-inv-96x96.png" type="Texture" id=3]
+[ext_resource path="res://sprites/edit-padded-ccc-128x128.png" type="Texture" id=3]
 [ext_resource path="res://sprites/rotate_right-aaa-128x128.png" type="Texture" id=4]
 [ext_resource path="res://sprites/rotate_right-ccc-128x128.png" type="Texture" id=5]
-[ext_resource path="res://sprites/edit-ccc-96x96.png" type="Texture" id=6]
-[ext_resource path="res://sprites/edit-aaa-96x96.png" type="Texture" id=7]
-[ext_resource path="res://sprites/edit-888-96x96.png" type="Texture" id=8]
+[ext_resource path="res://sprites/edit-padded-inv-128x128.png" type="Texture" id=6]
+[ext_resource path="res://sprites/edit-padded-aaa-128x128.png" type="Texture" id=7]
 [ext_resource path="res://sprites/rotate_right-inv-128x128.png" type="Texture" id=9]
 [ext_resource path="res://sprites/rotate_right-ccc-96x96.png" type="Texture" id=10]
 
@@ -20,8 +19,9 @@ antialiased = true
 polygon = PoolVector2Array( -50, -25, 50, -25, 0, 25 )
 
 [node name="Spin" type="TextureButton" parent="."]
-margin_right = 12.0
-margin_bottom = 20.0
+margin_right = 128.0
+margin_bottom = 128.0
+rect_scale = Vector2( 0.8, 0.8 )
 hint_tooltip = "Spin the wheel"
 focus_next = NodePath("../Settings")
 focus_previous = NodePath("../Settings")
@@ -38,15 +38,14 @@ __meta__ = {
 [node name="Settings" type="TextureButton" parent="."]
 margin_right = 96.0
 margin_bottom = 96.0
-rect_scale = Vector2( 0.75, 0.75 )
+rect_scale = Vector2( 0.8, 0.8 )
 hint_tooltip = "Settings"
 focus_next = NodePath("../Spin")
 focus_previous = NodePath("../Spin")
 texture_normal = ExtResource( 7 )
-texture_pressed = ExtResource( 3 )
-texture_hover = ExtResource( 6 )
-texture_disabled = ExtResource( 8 )
-texture_focused = ExtResource( 6 )
+texture_pressed = ExtResource( 6 )
+texture_hover = ExtResource( 3 )
+texture_focused = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

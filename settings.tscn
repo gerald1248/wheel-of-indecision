@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://settings.gd" type="Script" id=1]
 [ext_resource path="res://sprites/close-aaa-96x96.png" type="Texture" id=2]
@@ -6,24 +6,25 @@
 [ext_resource path="res://sprites/close-inv-96x96.png" type="Texture" id=4]
 [ext_resource path="res://sprites/close-ccc-96x96.png" type="Texture" id=5]
 [ext_resource path="res://sprites/check-ccc-96x96.png" type="Texture" id=6]
-[ext_resource path="res://sprites/check-888-96x96.png" type="Texture" id=7]
+[ext_resource path="res://sprites/check-555-96x96.png" type="Texture" id=7]
 [ext_resource path="res://sprites/check-inv-96x96.png" type="Texture" id=8]
 [ext_resource path="res://sprites/check-aaa-96x96.png" type="Texture" id=9]
 [ext_resource path="res://fonts/Roboto-Thin.ttf" type="DynamicFontData" id=10]
 [ext_resource path="res://fonts/Roboto-Bold.ttf" type="DynamicFontData" id=11]
+[ext_resource path="res://tree.gd" type="Script" id=12]
 
 [sub_resource type="DynamicFont" id=1]
 size = 40
 font_data = ExtResource( 11 )
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=2]
 size = 40
 font_data = ExtResource( 10 )
 
-[sub_resource type="Theme" id=2]
-default_font = SubResource( 4 )
+[sub_resource type="Theme" id=3]
+default_font = SubResource( 2 )
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=4]
 size = 40
 font_data = ExtResource( 10 )
 
@@ -42,35 +43,43 @@ __meta__ = {
 [node name="Tree" type="Tree" parent="."]
 margin_right = 40.0
 margin_bottom = 1.0
-theme = SubResource( 2 )
-custom_fonts/font = SubResource( 3 )
+focus_next = NodePath("../CancelButton")
+focus_previous = NodePath("../OkButton")
+theme = SubResource( 3 )
+custom_fonts/font = SubResource( 4 )
+script = ExtResource( 12 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="CancelButton" type="TextureButton" parent="."]
-margin_right = 54.0
-margin_bottom = 20.0
+margin_right = 96.0
+margin_bottom = 96.0
 rect_scale = Vector2( 0.75, 0.75 )
+focus_next = NodePath("../OkButton")
+focus_previous = NodePath("../Tree")
 texture_normal = ExtResource( 2 )
 texture_pressed = ExtResource( 4 )
 texture_hover = ExtResource( 5 )
 texture_disabled = ExtResource( 3 )
+texture_focused = ExtResource( 5 )
 
 [node name="OkButton" type="TextureButton" parent="."]
 margin_right = 31.0
 margin_bottom = 20.0
 rect_scale = Vector2( 0.75, 0.75 )
+focus_next = NodePath("../Tree")
+focus_previous = NodePath("../CancelButton")
 texture_normal = ExtResource( 9 )
 texture_pressed = ExtResource( 8 )
 texture_hover = ExtResource( 6 )
 texture_disabled = ExtResource( 7 )
+texture_focused = ExtResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 [connection signal="button_pressed" from="Tree" to="." method="_on_Tree_button_pressed"]
 [connection signal="cell_selected" from="Tree" to="." method="_on_Tree_cell_selected"]
 [connection signal="item_edited" from="Tree" to="." method="_on_Tree_item_edited"]
-[connection signal="item_selected" from="Tree" to="." method="_on_Tree_item_selected"]
 [connection signal="pressed" from="CancelButton" to="." method="_on_CancelButton_pressed"]
 [connection signal="pressed" from="OkButton" to="." method="_on_OkButton_pressed"]

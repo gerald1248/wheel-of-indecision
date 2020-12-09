@@ -4,13 +4,20 @@ onready var tree = get_node("Tree")
 var padding = global.gui_control_padding
 var height = global.gui_control_height
 var root = null
-var title = global.default_title
+var title = global.title
+var edited_item = null
+var tab_seen = false
+
 var person_texture = load("res://sprites/person-aaa-48x48.png")
 var group_texture = load("res://sprites/group_aaa-48x48.png")
 var groups_texture = load("res://sprites/groups-aaa-48x48.png")
 var person_add_texture = load("res://sprites/person_add-aaa-48x48.png")
 var group_add_texture = load("res://sprites/group_add-aaa-48x48.png")
 var remove_texture = load("res://sprites/remove-aaa-48x48.png")
+var arrow_right_texture = load("res://sprites/arrow_right-aaa-48x48.png")
+var arrow_down_texture = load("res://sprites/arrow_drop_down-aaa-48x48.png")
+var north_texture = load("res://sprites/north-aaa-48x48.png")
+var edit_texture = load("res://sprites/edit-aaa-48x48.png")
 
 func _ready():
 	var _err = get_tree().get_root().connect("size_changed", self, "on_window_resized")
@@ -20,16 +27,50 @@ func _ready():
 	root = tree.create_item()
 	root.set_text(0, "Groups")
 	root.set_icon(0, groups_texture)
+	root.set_selectable(0, false)
 	root.add_button(0, group_add_texture, 100, false, "add group")
 
-	build_tree(root, global.default_settings)
+	build_tree(root, global.settings)
 
 	tree.set_hide_root(false)
-	tree.set_hide_folding(true) # only for mobile?
+	tree.set_hide_folding(true)
 	tree.set_column_titles_visible(false)
 	tree.ensure_cursor_is_visible()
 	
 	tree.show()
+
+	show_current_selection()
+
+	$OkButton.grab_focus()
+
+func _process(delta):
+	if Input.is_action_pressed("ui_focus_next"):
+		if !tab_seen:
+			tab_seen = true
+			enable_keyboard_access()
+	elif Input.is_action_pressed("ui_focus_prev"):
+		if !tab_seen:
+			tab_seen = true
+			enable_keyboard_access()
+
+# currently unused - shortcuts required for buttons
+func enable_keyboard_access():
+	if !root:
+		return
+
+	root.set_selectable(0, true)
+
+	var my_item = root.get_children()
+	while my_item != null:
+		my_item.set_selectable(0, true)
+		my_item.set_editable(0, true)
+		
+		var my_subitem = my_item.get_children()
+		while my_subitem != null:
+			my_subitem.set_selectable(0, true)
+			my_subitem.set_editable(0, true)
+			my_subitem = my_subitem.get_next()
+		my_item = my_item.get_next()
 
 func build_tree(root, settings):
 	var wheels = settings.split(";")
@@ -48,19 +89,25 @@ func build_tree(root, settings):
 func add_item(title):
 	var my_item = tree.create_item(root)
 	my_item.set_text(0, title)
-	my_item.set_editable(0, true)
+	my_item.set_editable(0, false)
+	my_item.add_button(0, north_texture, 150, false, "select group")
+	my_item.add_button(0, edit_texture, 160, false, "edit group name")
 	my_item.add_button(0, person_add_texture, 200, false, "add person to group")
 	my_item.add_button(0, remove_texture, 300, false, "remove group")
 	my_item.set_icon(0, group_texture)
-	my_item.set_editable(0, true)
+	my_item.set_editable(0, false)
+	my_item.set_selectable(0, false)
 	return my_item
 
 func add_subitem(item, label):
 	var my_subitem = tree.create_item(item)
 	my_subitem.set_text(0, label)
-	my_subitem.set_editable(0, true)
+	my_subitem.set_editable(0, false)
+	my_subitem.add_button(0, edit_texture, 170, false, "edit name")
 	my_subitem.add_button(0, remove_texture, 400, false, "remove person")
 	my_subitem.set_icon(0, person_texture)
+	my_subitem.set_selectable(0, false)
+	
 	return my_subitem
 
 func on_window_resized():
@@ -79,6 +126,7 @@ func update_size():
 func _on_OkButton_pressed():
 	global.title = title
 	global.settings = get_settings()
+	global.save_config()
 
 	tree.clear()
 	
@@ -88,49 +136,74 @@ func _on_CancelButton_pressed():
 	tree.clear()
 	get_tree().change_scene("res://main.tscn")
 
-func _on_Tree_cell_selected():
-	var item = tree.get_next_selected(root)
-	
-	if (item == root ) or (!item):
-		return
-	
-	var label = item.get_text(0)
-	var parent = item.get_parent()
-	
-	# is item
-	if (parent == root):
-		title = label
-		$Label.text = title
-	# is subitem
-	else:
-		title = parent.get_text(0)
-		$Label.text = title
-
-func _on_Tree_item_edited():
-	pass
-
 func _on_Tree_button_pressed(item, column, id):
 	match id:
 		# add item
 		100:
-			var new_item = add_item(title)
+			var new_item = add_item("New group")
 			new_item.move_to_top()
+			activate_edit_mode(new_item)
+			validate_settings()
+		# select group
+		150:
+			var s = item.get_text(0)
+			if group_is_present(s):
+				title = s
+				$Label.text = title
+				validate_settings()
+		160:
+			activate_edit_mode(item)
+		170:
+			activate_edit_mode(item)
+			var parent = item.get_parent()
+			if parent:
+				title = parent.get_text(0)
+				$Label.text = title
 		# add subitem
 		200:
 			var new_subitem = add_subitem(item, "New group member")
 			new_subitem.move_to_top()
+			activate_edit_mode(new_subitem)
+			title = item.get_text(0)
+			$Label.text = title
+			validate_settings()
 		# remove item
 		300:
 			var parent = item.get_parent()
 			if parent:
 				parent.remove_child(item)
+				validate_settings()
+				if !title_is_present():
+					$Label.set_text("")
+					title = ""
 		# remove subitem
 		400:
 			var parent = item.get_parent()
 			if parent:
 				parent.remove_child(item)
+				validate_settings()
 		_:
 			pass
+
+func activate_edit_mode(item):
+	item.set_selectable(0, true)
+	item.set_editable(0, true)
+	item.select(0)
+	edited_item = item
+
+	var rect = tree.get_item_area_rect(item, 0)
+	call_deferred("simulate_input_event", rect, true)
+	call_deferred("simulate_input_event", rect, false)
+
+func simulate_input_event(rect, is_down):
+	var a = InputEventMouseButton.new()
+	var point = Vector2(rect.position.x + rect.size.x/2, rect.position.y + rect.size.y/2)
+	var offset = $Tree.rect_position - $Tree.get_scroll()
+	var center = point + offset
+	a.set_button_index(1)
+	a.set_pressed(is_down)
+	a.set_position(center)
+	Input.parse_input_event(a)
 
 func get_settings():
 	var s = ""
@@ -150,3 +223,72 @@ func get_settings():
 		s = s + ";"
 		my_item = my_item.get_next()
 	return s
+
+func _on_Tree_item_edited():
+	if !edited_item:
+		return
+	
+	var my_current = edited_item.get_text(0)
+	var my_validated = validate_name(my_current)
+	if my_current != my_validated:
+		edited_item.set_text(0, my_validated)
+	
+	# check if this is a group label
+	# if so, assume it's the new selection
+	# and set title accordingly
+	if edited_item.get_parent() == root:
+		title = my_validated
+		$Label.set_text(my_validated)
+
+	edited_item.set_selectable(0, false)
+	edited_item.set_editable(0, false)
+	edited_item.deselect(0)
+	edited_item = null
+
+	validate_settings()
+
+func validate_name(name):
+	var validated = name.replace(":", "")
+	validated = validated.replace(";", "")
+	return validated
+
+
+func validate_settings():
+	# ensure selected group name is present and contains at least one item
+	var valid = false
+
+	var my_item = root.get_children()
+	while my_item != null:
+		if my_item.get_text(0) == title && my_item.get_children():
+			valid = true
+		my_item = my_item.get_next()
+	
+	$OkButton.set_disabled(!valid)
+	var mode = 2 if valid else 0
+	$OkButton.set_focus_mode(mode)
+	return valid
+
+func group_is_present(name):
+	var my_item = root.get_children()
+	while my_item != null:
+		if my_item.get_text(0) == name:
+			return true
+		my_item = my_item.get_next()
+	return false
+
+func title_is_present():
+	return group_is_present(title)
+
+func show_current_selection():
+	if !root:
+		return
+	var my_item = root.get_children()
+	while my_item != null:
+		if my_item.get_text(0) == title:
+			my_item.set_selectable(0, true)
+			my_item.select(0)
+			tree.ensure_cursor_is_visible()
+			my_item.deselect(0)
+			my_item.set_selectable(0, false)
+			break
+		my_item = my_item.get_next()

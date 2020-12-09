@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/logo-alpha.png-07d5b6599bc803991b267c7b7f3e5a27.stex"
+path="res://.import/arrow_drop_down-aaa-48x48.png-1a236b6919f3e2a0f95d9898c22eecab.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/logo-alpha.png"
-dest_files=[ "res://.import/logo-alpha.png-07d5b6599bc803991b267c7b7f3e5a27.stex" ]
+source_file="res://sprites/arrow_drop_down-aaa-48x48.png"
+dest_files=[ "res://.import/arrow_drop_down-aaa-48x48.png-1a236b6919f3e2a0f95d9898c22eecab.stex" ]
 
 [params]
 

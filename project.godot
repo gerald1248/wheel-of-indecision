@@ -22,12 +22,13 @@ _global_script_class_icons={
 
 config/name="Wheel of Indecision"
 run/main_scene="res://main.tscn"
-boot_splash/image="res://sprites/logo-alpha.png"
+boot_splash/image="res://sprites/transparent.png"
 boot_splash/fullsize=false
 boot_splash/use_filter=false
 boot_splash/bg_color=Color( 0.141176, 0.141176, 0.141176, 1 )
 config/icon="res://icon.png"
 config/macos_native_icon="res://sprites/icon-512x512.png"
+config/windows_native_icon="res://icon.ico"
 
 [autoload]
 
@@ -40,6 +41,7 @@ settings/fps/force_fps=60
 [display]
 
 window/dpi/allow_hidpi=true
+window/handheld/orientation="sensor"
 
 [gui]
 
