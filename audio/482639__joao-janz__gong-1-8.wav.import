@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/482639__joao-janz__gong-1-8.wav-a1b181f4d0efbe3b953d76d83de9b36e.sample"
+
+[deps]
+
+source_file="res://audio/482639__joao-janz__gong-1-8.wav"
+dest_files=[ "res://.import/482639__joao-janz__gong-1-8.wav-a1b181f4d0efbe3b953d76d83de9b36e.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

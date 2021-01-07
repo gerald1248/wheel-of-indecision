@@ -1,7 +1,10 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://main.gd" type="Script" id=1]
 [ext_resource path="res://fonts/Roboto-Light.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://audio/482573__joao-janz__triangle-1-1.wav" type="AudioStream" id=3]
+[ext_resource path="res://audio/482572__joao-janz__triangle-1-2.wav" type="AudioStream" id=4]
+[ext_resource path="res://audio/482639__joao-janz__gong-1-8.wav" type="AudioStream" id=5]
 
 [sub_resource type="DynamicFont" id=1]
 size = 160
@@ -16,3 +19,30 @@ script = ExtResource( 1 )
 visible = false
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 1 )
+
+[node name="audio01" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="audio02" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+
+[node name="audio03" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="audio04" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+
+[node name="audio05" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="audio06" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+
+[node name="audio07" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 4 )
+
+[node name="audio08" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+
+[node name="gong" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 5 )

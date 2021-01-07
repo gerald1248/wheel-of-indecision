@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/woodblock.wav-f07f51c5cd87a489b88723298b07aa4a.sample"
+
+[deps]
+
+source_file="res://audio/woodblock.wav"
+dest_files=[ "res://.import/woodblock.wav-f07f51c5cd87a489b88723298b07aa4a.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

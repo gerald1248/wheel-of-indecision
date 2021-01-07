@@ -1,5 +1,7 @@
 extends Node
 
+const debug = false
+
 const config_path = "user://wheel-of-indecision.data"
 const radius = 900
 const base_top_speed = 6 * PI
@@ -11,6 +13,20 @@ const gui_control_height = 64
 
 const wheel_delimiter = ";"
 const label_delimiter = ":"
+
+var viewport_size
+var viewport_ratio
+var safe_area
+var safe_area_position
+var is_ios
+var is_ipad
+var is_iphone_x
+var is_android
+var hud_padding
+var bell_rad = PI
+var bell_adjustment_rad = 0.0
+
+var debug_string = ""
 
 const default_settings = \
 	"Team:Alexander:Ali:Do Yoon:Maria:Nozomi:Saanvi:Sofia:Wei;" \
@@ -34,6 +50,19 @@ func _ready():
 		settings = default_settings
 		title = default_title
 
+	# prepare for device and screen management
+	safe_area = OS.get_window_safe_area()
+	safe_area_position = Vector2(safe_area.position.x, safe_area.position.y)
+	viewport_size = get_viewport().get_visible_rect().size
+	hud_padding = safe_area_position.x
+
+	viewport_size = get_viewport().get_visible_rect().size
+	viewport_ratio = max(viewport_size.x, viewport_size.y)/min(viewport_size.x, viewport_size.y)
+	is_ios = OS.get_name() == "iOS"
+	is_ipad = is_ios && viewport_ratio < 1.34
+	is_iphone_x = is_ios && viewport_ratio > 1.8
+	is_android = OS.get_name() == "Android"
+
 func get_labels(my_settings, my_title):
 	var wheels = my_settings.split(";")
 	for wheel in wheels:
@@ -48,20 +77,33 @@ func get_labels(my_settings, my_title):
 	return []
 
 func is_mobile():
-		var my_name = OS.get_name()
-		return (my_name == "iOS" || my_name == "Android")
+	var my_name = OS.get_name()
+	return (my_name == "iOS" || my_name == "Android")
 
 func load_config():
-		var file = File.new()
-		if not file.file_exists(config_path): return
-		file.open(config_path, File.READ)
-		settings = file.get_var()
-		title = file.get_var()
-		file.close()
+	var file = File.new()
+	if not file.file_exists(config_path): return
+	file.open(config_path, File.READ)
+	settings = file.get_var()
+	title = file.get_var()
+	file.close()
 
 func save_config():
-		var file = File.new()
-		file.open(config_path, File.WRITE)
-		file.store_var(settings)
-		file.store_var(title)
-		file.close()
+	var file = File.new()
+	file.open(config_path, File.WRITE)
+	file.store_var(settings)
+	file.store_var(title)
+	file.close()
+
+func is_bell_interval(previous_rad, current_rad):
+	previous_rad += bell_adjustment_rad
+	current_rad += bell_adjustment_rad
+	var previous_rad_mod = fmod(previous_rad, PI*2)
+	var current_rad_mod = fmod(current_rad, PI*2)
+	# clockwise
+	if previous_rad < current_rad && current_rad_mod < previous_rad_mod:
+		return true
+	# anti-clockwise
+	elif current_rad < previous_rad && previous_rad_mod < current_rad_mod:
+		return true
+	return false

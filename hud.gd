@@ -3,7 +3,8 @@ extends Node2D
 var padding = global.gui_padding
 
 func _ready():
-	pass
+	if global.is_iphone_x:
+		padding = max(global.safe_area_position.x, global.safe_area_position.y) * 0.75
 
 func update_size(viewport_size, viewport_center):
 	if (min(viewport_size.y/2, viewport_size.x/2) < global.radius):
@@ -15,7 +16,9 @@ func update_size(viewport_size, viewport_center):
 	
 	$Settings.rect_position = Vector2(viewport_size.x - $Settings.rect_size.x - padding, padding)
 	$Spin.rect_position = Vector2(viewport_size.x - $Spin.rect_size.x - padding, viewport_size.y - $Spin.rect_size.y - padding)
-	$Spin.grab_focus()
+
+	if !global.is_mobile():
+		$Spin.grab_focus()
 
 func _on_Settings_pressed():
 	get_tree().change_scene("res://settings.tscn")

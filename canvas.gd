@@ -69,6 +69,12 @@ func _draw():
 
 	label_count = labels.size()
 	label_step_rad = 2 * PI/label_count
+
+	# make bell interval available to main scene
+	global.bell_adjustment_rad = 0.0
+	if (label_count % 4 == 0):
+		global.bell_adjustment_rad = label_step_rad/2
+
 	var current_rotation_rad = 0.0
 
 	var counter = 0

@@ -21,6 +21,10 @@ var edit_texture = load("res://sprites/edit-aaa-48x48.png")
 
 func _ready():
 	var _err = get_tree().get_root().connect("size_changed", self, "on_window_resized")
+
+	if global.is_iphone_x:
+		padding = max(global.safe_area_position.x, global.safe_area_position.y) * 0.75
+
 	update_size()
 
 	$Label.text = title
@@ -41,7 +45,11 @@ func _ready():
 
 	show_current_selection()
 
-	$OkButton.grab_focus()
+	if !global.is_mobile():
+		$OkButton.grab_focus()
+
+	if global.debug:
+		$Label.text = global.debug_string
 
 func _process(delta):
 	if Input.is_action_pressed("ui_focus_next"):
@@ -111,7 +119,7 @@ func add_subitem(item, label):
 	return my_subitem
 
 func on_window_resized():
-	update_size()
+	call_deferred("update_size")#update_size()
 
 func update_size():
 	var viewport_size = get_viewport().get_visible_rect().size

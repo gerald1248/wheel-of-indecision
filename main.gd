@@ -4,6 +4,7 @@ const CANVAS = preload("res://canvas.tscn")
 const HUD = preload("res://hud.tscn")
 var rotation_per_second_rad = 0.0
 var start_angle = 0.0
+var current_rotation_rad = 0.0
 var canvas = null
 var hud = null
 var timer = null
@@ -23,10 +24,13 @@ var previous_drag_time_msec = 0
 var delta_rad = 0.0
 var delta_msec = 0
 var drag_time_threshold = 100
+var audio_current_index = 0
+var audio_max_index = 8
 
 func _ready():
 	rng = RandomNumberGenerator.new()
 
+	#var _err = get_viewport().connect("size_changed", self, "on_window_resized")#get_tree().get_root().connect("size_changed", self, "on_window_resized")
 	var _err = get_tree().get_root().connect("size_changed", self, "on_window_resized")
 	viewport_size = get_viewport().get_visible_rect().size
 	canvas = CANVAS.instance()
@@ -36,6 +40,8 @@ func _ready():
 	hud = HUD.instance()
 	hud.z_index = 100
 	add_child(hud)
+	
+	global.debug_string = str(global.debug_string, ":")
 
 	update_size()
 
@@ -54,8 +60,13 @@ func _process(delta):
 		pass
 
 	# apply rotation
+	var previous_rotation_rad = canvas.rotation
 	canvas.rotate(delta * rotation_per_second_rad)
+	current_rotation_rad = canvas.rotation
 	
+	if global.is_bell_interval(previous_rotation_rad, current_rotation_rad):
+		play_bell()
+
 	var postpone_deceleration = spinning && canvas.rotation < start_angle
 	
 	if (abs(rotation_per_second_rad) > 0.0 && !postpone_deceleration):
@@ -72,7 +83,7 @@ func _process(delta):
 			lerp($Label.rect_scale.y, 1.0, 0.1))
 
 func on_window_resized():
-	update_size()
+	call_deferred("update_size")
 
 func update_size():
 	$Label.hide()
@@ -89,6 +100,8 @@ func update_size():
 	canvas.transform = Transform2D(0.0, viewport_center)
 	canvas.scale = Vector2(scale, scale)
 	global.scale = scale
+
+	canvas.rotation = current_rotation_rad
 
 	# HUD update requires current scale
 	hud.update_size(viewport_size, viewport_center)
@@ -115,6 +128,8 @@ func reveal():
 	$Label.rect_scale = Vector2(0.25, 0.25)
 	$Label.show_on_top = true
 	$Label.show()
+
+	$gong.play()
 
 func stop():
 	reveal = false
@@ -167,6 +182,10 @@ func _unhandled_input(event):
 			
 			var my_delta = rotation_rad - previous_rotation_rad
 			canvas.rotate(my_delta)
+			
+			# sound bell as appropriate
+			if global.is_bell_interval(previous_rotation_rad, rotation_rad):
+				call_deferred("play_bell")
 
 			# now update delta_rad
 			var now = OS.get_ticks_msec()
@@ -192,3 +211,28 @@ func _notification(what):
 						global.save_config()
 				MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
 						get_tree().quit()
+
+func play_bell():
+	var audio = null
+	match (audio_current_index):
+		0:
+			audio = $audio01
+		1:
+			audio = $audio02
+		2:
+			audio = $audio03
+		3:
+			audio = $audio04
+		4:
+			audio = $audio05
+		5:
+			audio = $audio06
+		6:
+			audio = $audio07
+		7:
+			audio = $audio08
+	# play even if it means interrupting the current sample
+	# this only occurs when the wheel is spinning fast
+	audio.play()
+	audio_current_index += 1
+	audio_current_index = audio_current_index % audio_max_index
