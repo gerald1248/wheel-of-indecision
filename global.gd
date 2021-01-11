@@ -36,12 +36,14 @@ const default_settings = \
 	+ "Die (10 sides):1:2:3:4:5:6:7:8:9:10;" \
 	+ "Die (20 sides):1:2:3:4:5:6:7:8:9:10:11:12:13:14:15:16:17:18:19:20;"
 const default_title = "Team"
+const default_audio_enabled = true
 
 var scale = 1.0
 
 var settings = ""
 var title = ""
 var labels = []
+var audio_enabled = true
 
 func _ready():
 	load_config()
@@ -86,6 +88,9 @@ func load_config():
 	file.open(config_path, File.READ)
 	settings = file.get_var()
 	title = file.get_var()
+	audio_enabled = file.get_var()
+	if (typeof(audio_enabled) == TYPE_NIL):
+		audio_enabled = default_audio_enabled
 	file.close()
 
 func save_config():
@@ -93,6 +98,7 @@ func save_config():
 	file.open(config_path, File.WRITE)
 	file.store_var(settings)
 	file.store_var(title)
+	file.store_var(audio_enabled)
 	file.close()
 
 func is_bell_interval(previous_rad, current_rad):

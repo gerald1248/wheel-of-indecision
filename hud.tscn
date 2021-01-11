@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=15 format=2]
 
 [ext_resource path="res://hud.gd" type="Script" id=1]
 [ext_resource path="res://sprites/rotate_right-888-128x128.png" type="Texture" id=2]
@@ -7,8 +7,13 @@
 [ext_resource path="res://sprites/rotate_right-ccc-128x128.png" type="Texture" id=5]
 [ext_resource path="res://sprites/edit-padded-inv-128x128.png" type="Texture" id=6]
 [ext_resource path="res://sprites/edit-padded-aaa-128x128.png" type="Texture" id=7]
+[ext_resource path="res://sprites/volume_up-ccc-128x128.png" type="Texture" id=8]
 [ext_resource path="res://sprites/rotate_right-inv-128x128.png" type="Texture" id=9]
-[ext_resource path="res://sprites/rotate_right-ccc-96x96.png" type="Texture" id=10]
+[ext_resource path="res://sprites/volume_off-ccc-128x128.png" type="Texture" id=10]
+[ext_resource path="res://sprites/volume_up-aaa-128x128.png" type="Texture" id=11]
+[ext_resource path="res://sprites/volume_up-inv-128x128.png" type="Texture" id=12]
+[ext_resource path="res://sprites/volume_off-aaa-128x128.png" type="Texture" id=13]
+[ext_resource path="res://sprites/volume_off-inv-128x128.png" type="Texture" id=14]
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
@@ -30,7 +35,6 @@ texture_normal = ExtResource( 4 )
 texture_pressed = ExtResource( 9 )
 texture_hover = ExtResource( 5 )
 texture_disabled = ExtResource( 2 )
-texture_focused = ExtResource( 10 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -40,14 +44,39 @@ margin_right = 96.0
 margin_bottom = 96.0
 rect_scale = Vector2( 0.8, 0.8 )
 hint_tooltip = "Settings"
-focus_next = NodePath("../Spin")
+focus_next = NodePath("../SoundOn")
 focus_previous = NodePath("../Spin")
 texture_normal = ExtResource( 7 )
 texture_pressed = ExtResource( 6 )
 texture_hover = ExtResource( 3 )
-texture_focused = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="pressed" from="Spin" to="." method="_on_Spin_pressed"]
+
+[node name="SoundOn" type="TextureButton" parent="."]
+rect_scale = Vector2( 0.8, 0.8 )
+hint_tooltip = "Sound ON"
+focus_next = NodePath("../Spin")
+focus_previous = NodePath("../Settings")
+texture_normal = ExtResource( 11 )
+texture_pressed = ExtResource( 12 )
+texture_hover = ExtResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SoundOff" type="TextureButton" parent="."]
+rect_scale = Vector2( 0.8, 0.8 )
+hint_tooltip = "Sound OFF"
+focus_next = NodePath("../Spin")
+focus_previous = NodePath("../Settings")
+texture_normal = ExtResource( 13 )
+texture_pressed = ExtResource( 14 )
+texture_hover = ExtResource( 10 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="button_down" from="Spin" to="." method="_on_Spin_button_down"]
 [connection signal="pressed" from="Settings" to="." method="_on_Settings_pressed"]
+[connection signal="button_down" from="SoundOn" to="." method="_on_SoundOn_button_down"]
+[connection signal="button_down" from="SoundOff" to="." method="_on_SoundOff_button_down"]

@@ -62,7 +62,9 @@ texture_normal = ExtResource( 2 )
 texture_pressed = ExtResource( 4 )
 texture_hover = ExtResource( 5 )
 texture_disabled = ExtResource( 3 )
-texture_focused = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="OkButton" type="TextureButton" parent="."]
 margin_right = 31.0
@@ -74,7 +76,6 @@ texture_normal = ExtResource( 9 )
 texture_pressed = ExtResource( 8 )
 texture_hover = ExtResource( 6 )
 texture_disabled = ExtResource( 7 )
-texture_focused = ExtResource( 6 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

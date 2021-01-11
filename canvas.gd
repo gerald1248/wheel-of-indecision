@@ -1,7 +1,6 @@
 extends Node2D
 
 var labels = global.get_labels(global.settings, global.title)
-var center = Vector2(0, 0)
 var radius = global.radius
 var radius_border = radius/10
 var label_box_width = global.radius - radius_border * 2
@@ -109,18 +108,18 @@ func get_font_color(my_color):
 	return Color("#111111") if luma > 0.6 else Color("#ffffff")
 
 # https://docs.godotengine.org/en/stable/tutorials/2d/custom_drawing_in_2d.html
-func draw_circle_arc_poly(center, radius, angle_from, angle_to, color):
+func draw_circle_arc_poly(center, my_radius, angle_from, angle_to, color):
 	var nb_points = 32
 	var points_arc = PoolVector2Array()
 	points_arc.push_back(center)
-	var colors = PoolColorArray([color])
+	var my_colors = PoolColorArray([color])
 
 	for i in range(nb_points + 1):
 		var angle_point = deg2rad(angle_from + i * (angle_to - angle_from) / nb_points - 90)
-		points_arc.push_back(center + Vector2(cos(angle_point), sin(angle_point)) * radius)
+		points_arc.push_back(center + Vector2(cos(angle_point), sin(angle_point)) * my_radius)
 	draw_polygon(
 		points_arc,
-		colors,
+		my_colors,
 		PoolVector2Array(),
 		null,
 		null,
@@ -149,7 +148,6 @@ func get_top_label(rotation_rad):
 	
 	var index = 0
 	var adjust = 4.712389 # pick top label
-	var selection = ""
 	var lower = 0.0
 	var upper = 0.0
 	for label in labels_inverted:

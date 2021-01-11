@@ -12,10 +12,13 @@ var rng = null
 var viewport_size = Vector2(0, 0)
 var viewport_center = Vector2(0, 0)
 var spinning = false
-var reveal = false
+var is_reveal = false
 var desired_transform = Transform2D()
 var countdown = 0
 var font = null
+var default_banner_font_size = 160
+var banner_min_scale = 0.2
+var banner_max_scale = 1.0
 
 # manage touch control state
 var previous_rotation_rad = 0.0
@@ -26,11 +29,11 @@ var delta_msec = 0
 var drag_time_threshold = 100
 var audio_current_index = 0
 var audio_max_index = 8
+var is_wheel_drag = false
 
 func _ready():
 	rng = RandomNumberGenerator.new()
 
-	#var _err = get_viewport().connect("size_changed", self, "on_window_resized")#get_tree().get_root().connect("size_changed", self, "on_window_resized")
 	var _err = get_tree().get_root().connect("size_changed", self, "on_window_resized")
 	viewport_size = get_viewport().get_visible_rect().size
 	canvas = CANVAS.instance()
@@ -47,7 +50,7 @@ func _ready():
 
 	font = DynamicFont.new()
 	font.font_data = load("res://fonts/Roboto-Light.ttf")
-	font.size = 160
+	font.size = default_banner_font_size
 
 func _process(delta):
 	if Input.is_action_pressed("ui_up"):
@@ -60,11 +63,11 @@ func _process(delta):
 		pass
 
 	# apply rotation
-	var previous_rotation_rad = canvas.rotation
+	var my_previous_rotation_rad = canvas.rotation
 	canvas.rotate(delta * rotation_per_second_rad)
 	current_rotation_rad = canvas.rotation
 	
-	if global.is_bell_interval(previous_rotation_rad, current_rotation_rad):
+	if global.audio_enabled && global.is_bell_interval(my_previous_rotation_rad, current_rotation_rad):
 		play_bell()
 
 	var postpone_deceleration = spinning && canvas.rotation < start_angle
@@ -77,10 +80,10 @@ func _process(delta):
 			start_angle = 0.0
 			reveal()
 	
-	if (reveal):
+	if (is_reveal):
 		$Label.rect_scale = Vector2(
-			lerp($Label.rect_scale.x, 1.0, 0.1),
-			lerp($Label.rect_scale.y, 1.0, 0.1))
+			lerp($Label.rect_scale.x, banner_max_scale, 0.1),
+			lerp($Label.rect_scale.y, banner_max_scale, 0.1))
 
 func on_window_resized():
 	call_deferred("update_size")
@@ -115,25 +118,33 @@ func spin():
 	rotation_per_second_rad = global.base_top_speed if rotation_per_second_rad <= 0.0 else global.base_top_speed + rotation_per_second_rad
 
 func reveal():
-	reveal = true
+	is_reveal = true
 
 	var current_rotation = fmod(canvas.rotation, 2 * PI)
 	var selection = canvas.get_node("Canvas").get_top_label(current_rotation)
+	
 	var label_size = font.get_string_size(selection)
+
+	banner_max_scale = 1.0
+	if label_size.x > viewport_size.x:
+		var factor = float(viewport_size.x)/float(label_size.x)
+		banner_max_scale = factor if factor > banner_min_scale else banner_min_scale
+
 	var offset = Vector2(label_size.x/2, label_size.y/2)
 
 	$Label.text = selection
 	$Label.rect_pivot_offset = offset
 	$Label.rect_position = viewport_center - offset
-	$Label.rect_scale = Vector2(0.25, 0.25)
+	$Label.rect_scale = Vector2(banner_min_scale, banner_min_scale)
 	$Label.show_on_top = true
 	$Label.show()
 
-	$gong.play()
+	if global.audio_enabled:
+		$gong.play()
 
 func stop():
-	reveal = false
-	spinning = false # experimental
+	is_reveal = false
+	spinning = false
 	rotation_per_second_rad = 0.0
 
 func point_on_wheel(p1):
@@ -145,7 +156,7 @@ func _unhandled_input(event):
 		"InputEventScreenTouch":
 			var position = event.position
 
-			if !point_on_wheel(position):
+			if !point_on_wheel(position) && !is_wheel_drag:
 				return
 
 			var rotation_rad = get_rotation_at(position)
@@ -170,13 +181,16 @@ func _unhandled_input(event):
 				else:
 					delta_msec = 1 if delta_msec < 1 else delta_msec
 					rotation_per_second_rad = (delta_rad/delta_msec) * 1000
+				is_wheel_drag = false
 		"InputEventScreenDrag":
 			var position = event.position
 
-			if !point_on_wheel(position):
+			if !point_on_wheel(position) && !is_wheel_drag:
 				return
 
 			stop()
+
+			is_wheel_drag = true # drag originated on wheel
 
 			var rotation_rad = get_rotation_at(position)
 			
@@ -184,8 +198,8 @@ func _unhandled_input(event):
 			canvas.rotate(my_delta)
 			
 			# sound bell as appropriate
-			if global.is_bell_interval(previous_rotation_rad, rotation_rad):
-				call_deferred("play_bell")
+			if global.audio_enabled && global.is_bell_interval(previous_rotation_rad, rotation_rad):
+				play_bell()
 
 			# now update delta_rad
 			var now = OS.get_ticks_msec()
