@@ -3,9 +3,11 @@ extends Node
 const debug = false
 
 const config_path = "user://wheel-of-indecision.data"
-const radius = 900
-const base_top_speed = 6 * PI
-const font_size = 76
+const base_top_speed = 4 * PI
+
+# radius and font_size have to be mutable
+var radius = 900
+var font_size = 76
 
 const gui_padding = 30
 const gui_control_padding = 20
@@ -64,6 +66,11 @@ func _ready():
 	is_ipad = is_ios && viewport_ratio < 1.34
 	is_iphone_x = is_ios && viewport_ratio > 1.8
 	is_android = OS.get_name() == "Android"
+
+	# reduce size for 1080p and smaller mobile screens
+	if (is_android || is_ios) && min(viewport_size.x, viewport_size.y) <= 1080:
+		radius = radius/2
+		font_size = font_size/2
 
 func get_labels(my_settings, my_title):
 	var wheels = my_settings.split(";")

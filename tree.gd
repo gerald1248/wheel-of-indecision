@@ -9,8 +9,7 @@ func _ready():
 	for child in children:
 		if "VScrollBar" in str(child):
 			var current_size = child.get_size()
-			print("current_size=", current_size)
-			child.rect_min_size = Vector2(24, current_size.y)
+			child.rect_min_size = Vector2(28, current_size.y)
 
 func _unhandled_input(event):
 	pass

@@ -35,10 +35,6 @@ config/windows_native_icon="res://icon.ico"
 
 global="*res://global.tscn"
 
-[debug]
-
-settings/fps/force_fps=60
-
 [display]
 
 window/dpi/allow_hidpi=true

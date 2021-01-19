@@ -2,6 +2,10 @@ extends Node2D
 
 onready var tree = get_node("Tree")
 var padding = global.gui_control_padding
+var padding_top = padding
+var padding_bottom = padding
+var padding_left = padding
+var padding_right = padding
 var height = global.gui_control_height
 var root = null
 var title = global.title
@@ -21,9 +25,6 @@ var edit_texture = load("res://sprites/edit-aaa-48x48.png")
 
 func _ready():
 	var _err = get_tree().get_root().connect("size_changed", self, "on_window_resized")
-
-	if global.is_iphone_x:
-		padding = max(global.safe_area_position.x, global.safe_area_position.y) * 0.75
 
 	update_size()
 
@@ -119,17 +120,44 @@ func add_subitem(item, label):
 	return my_subitem
 
 func on_window_resized():
-	call_deferred("update_size")#update_size()
+	update_size()
 
 func update_size():
+	padding = global.gui_control_padding
+	padding_top = padding
+	padding_bottom = padding
+	padding_left = padding
+	padding_right = padding
+	if global.is_iphone_x:
+		var padding_notch = max(global.safe_area_position.x, global.safe_area_position.y)
+		var padding_opposite_notch = padding_notch/2
+		var viewport_size = get_viewport().get_visible_rect().size
+
+		# Godot doesn't report iOS orientation for iPhone X reliably,
+		# so reverse orientations are disabled in export settings
+
+		# portrait orientation
+		if (viewport_size.y > viewport_size.x):
+			padding_top = padding_notch
+			padding_bottom = padding_opposite_notch
+			padding_left = padding
+			padding_right = padding
+		else:
+			padding_top = padding
+			padding_bottom = padding
+			padding_left = padding_opposite_notch
+			padding_right = padding_notch
+
 	var viewport_size = get_viewport().get_visible_rect().size
-	tree.set_size(Vector2(viewport_size.x - 2 * padding, viewport_size.y - $OkButton.rect_size.y - 2 * padding))
-	tree.set_position(Vector2(padding, padding + $OkButton.rect_size.y))
+	tree.set_size(Vector2(viewport_size.x - padding_left - padding_right, viewport_size.y - $OkButton.rect_size.y - padding_bottom - padding_top))
+	tree.set_position(Vector2(padding_left, padding_top + $OkButton.rect_size.y))
 	
 	var label_gap = (height - $Label.rect_size.y)/2
-	$Label.set_position(Vector2(padding, padding + label_gap))
-	$CancelButton.set_position(Vector2(viewport_size.x - $CancelButton.rect_size.x * 2 - padding, padding))
-	$OkButton.set_position(Vector2(viewport_size.x - $OkButton.rect_size.x - padding, padding))
+	$Label.set_position(Vector2(padding_left, padding_top + label_gap))
+
+	$CancelButton.set_position(Vector2(viewport_size.x - $CancelButton.rect_size.x * 2 - padding_right, padding_top))
+
+	$OkButton.set_position(Vector2(viewport_size.x - $OkButton.rect_size.x - padding_right, padding_top))
 
 func _on_OkButton_pressed():
 	global.title = title

@@ -7,7 +7,6 @@ func _ready():
 		padding = max(global.safe_area_position.x, global.safe_area_position.y) * 0.75
 	set_audio_enabled(global.audio_enabled)
 
-
 func update_size(viewport_size, viewport_center):
 	if (min(viewport_size.y/2, viewport_size.x/2) < global.radius):
 		var y = viewport_center.y - global.radius * global.scale
@@ -34,7 +33,7 @@ func _on_SoundOff_button_down():
 	set_audio_enabled(true)
 
 func _on_Spin_button_down():
-	get_tree().get_root().get_node("Node2D").spin()
+	get_tree().get_root().get_node("Main").spin()
 
 func set_audio_enabled(b):
 	if (b):
@@ -42,15 +41,17 @@ func set_audio_enabled(b):
 		$SoundOff.hide()
 		$Settings.focus_next = get_node("SoundOn").get_path()
 		$Spin.focus_previous = get_node("SoundOn").get_path()
-		$SoundOn.grab_focus()
 		global.audio_enabled = true
+		if !global.is_mobile():
+			$SoundOn.grab_focus()
 	else:
 		$SoundOff.show()
 		$SoundOn.hide()
 		$Settings.focus_next = get_node("SoundOff").get_path()
 		$Spin.focus_previous = get_node("SoundOff").get_path()
-		$SoundOff.grab_focus()
 		global.audio_enabled = false
+		if !global.is_mobile():
+			$SoundOff.grab_focus()
 	# need to save config here as normally only called from settings screen
 	global.save_config()
 

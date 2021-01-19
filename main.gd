@@ -19,6 +19,7 @@ var font = null
 var default_banner_font_size = 160
 var banner_min_scale = 0.2
 var banner_max_scale = 1.0
+var friction_factor = 0.015
 
 # manage touch control state
 var previous_rotation_rad = 0.0
@@ -72,8 +73,8 @@ func _process(delta):
 
 	var postpone_deceleration = spinning && canvas.rotation < start_angle
 	
-	if (abs(rotation_per_second_rad) > 0.0 && !postpone_deceleration):
-		rotation_per_second_rad = lerp(rotation_per_second_rad, 0.0, 0.015)
+	if (abs(rotation_per_second_rad) > 0.0 && !postpone_deceleration):		
+		rotation_per_second_rad = lerp(rotation_per_second_rad, 0.0, friction_factor)
 		if abs(rotation_per_second_rad) < 0.05:
 			rotation_per_second_rad = 0.0
 			spinning = false
@@ -113,8 +114,11 @@ func spin():
 	spinning = true
 	$Label.hide()
 
+	canvas.rotation = fmod(canvas.rotation, 2 * PI)
+
 	rng.randomize()
-	start_angle = canvas.rotation + 2 * PI + rng.randf() * PI * 2.0
+	var rand = rng.randf()
+	start_angle = canvas.rotation + 2 * PI + rand * PI * 2.0
 	rotation_per_second_rad = global.base_top_speed if rotation_per_second_rad <= 0.0 else global.base_top_speed + rotation_per_second_rad
 
 func reveal():
