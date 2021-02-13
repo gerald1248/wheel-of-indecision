@@ -16,6 +16,27 @@ const gui_control_height = 64
 const wheel_delimiter = ";"
 const label_delimiter = ":"
 
+const about_text = """
+Copyright © 2021 Gerald Schmidt, MIT License
+<github.com/gerald1248/wheel-of-indecision>
+
+Godot Engine by Juan Linietsky, Ariel Manzur and Godot Engine Contributors, MIT License
+<github.com/godotengine/godot>
+
+Percussion samples taken from sample pack Percussion by Joao_Janz
+Attribution Noncommercial: http://creativecommons.org/licenses/by-nc/3.0/
+<freesound.org/people/Joao_Janz/packs/27269>
+
+Color palette taken from Colors by mrmrs, MIT License
+<github.com/mrmrs/colors>
+
+Icons taken from Material Design set, Apache License, Version 2.0
+<material.io/resources/icons/?style=baseline>
+
+Roboto font by Christian Robertson, Apache License, Version 2.0
+<fonts.google.com/specimen/Roboto>
+"""
+
 var viewport_size
 var viewport_ratio
 var safe_area
@@ -67,8 +88,9 @@ func _ready():
 	is_iphone_x = is_ios && viewport_ratio > 1.8
 	is_android = OS.get_name() == "Android"
 
-	# reduce size for 1080p and smaller mobile screens
-	if (is_android || is_ios) && min(viewport_size.x, viewport_size.y) <= 1080:
+	# halve radius when it does not add to the resolution
+	# applies to mobile only
+	if (is_android || is_ios) && min(viewport_size.x, viewport_size.y) <= radius:
 		radius = radius/2
 		font_size = font_size/2
 
@@ -120,3 +142,8 @@ func is_bell_interval(previous_rad, current_rad):
 	elif current_rad < previous_rad && previous_rad_mod < current_rad_mod:
 		return true
 	return false
+
+func show_about():
+	$AcceptDialog.dialog_text = about_text
+	$AcceptDialog.get_close_button().hide()
+	$AcceptDialog.popup_centered_minsize()

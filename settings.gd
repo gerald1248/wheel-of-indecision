@@ -41,6 +41,8 @@ func _ready():
 	tree.set_hide_folding(true)
 	tree.set_column_titles_visible(false)
 	tree.ensure_cursor_is_visible()
+
+	z_index = -5
 	
 	tree.show()
 
@@ -51,6 +53,11 @@ func _ready():
 
 	if global.debug:
 		$Label.text = global.debug_string
+
+func _notification(what):
+	match (what):
+		MainLoop.NOTIFICATION_WM_ABOUT:
+			global.show_about()
 
 func _process(delta):
 	if Input.is_action_pressed("ui_focus_next"):

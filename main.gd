@@ -38,11 +38,11 @@ func _ready():
 	var _err = get_tree().get_root().connect("size_changed", self, "on_window_resized")
 	viewport_size = get_viewport().get_visible_rect().size
 	canvas = CANVAS.instance()
-	canvas.z_index = -1
+	canvas.z_index = -100
 	add_child(canvas)
 
 	hud = HUD.instance()
-	hud.z_index = 100
+	hud.z_index = -50
 	add_child(hud)
 	
 	global.debug_string = str(global.debug_string, ":")
@@ -224,11 +224,13 @@ func get_rotation_at(my_position):
 func _notification(what):
 		match (what):
 				MainLoop.NOTIFICATION_WM_FOCUS_OUT:
-						global.save_config()
+					global.save_config()
 				MainLoop.NOTIFICATION_WM_GO_BACK_REQUEST:
-						global.save_config()
+					global.save_config()
 				MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
-						get_tree().quit()
+					get_tree().quit()
+				MainLoop.NOTIFICATION_WM_ABOUT:
+					global.show_about()
 
 func play_bell():
 	var audio = null

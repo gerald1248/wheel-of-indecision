@@ -37,6 +37,8 @@ global="*res://global.tscn"
 
 [display]
 
+window/size/width=1440
+window/size/height=900
 window/dpi/allow_hidpi=true
 window/handheld/orientation="sensor"
 
